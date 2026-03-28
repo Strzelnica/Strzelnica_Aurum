@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Aurum Globe</title>
+
+  <!-- ── PWA / Home Screen ── -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Aurum Globe">
+  <meta name="theme-color" content="#0e0e0f">
+
+  <!-- ── Favicon & Apple Touch Icon (inline SVG → data URI) ── -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3CradialGradient id='bg' cx='50%25' cy='35%25' r='65%25'%3E%3Cstop offset='0' stop-color='%23292217'/%3E%3Cstop offset='1' stop-color='%230e0e0f'/%3E%3C/radialGradient%3E%3CradialGradient id='rim' cx='50%25' cy='30%25' r='55%25'%3E%3Cstop offset='0' stop-color='%23E2C97E'/%3E%3Cstop offset='0.5' stop-color='%23C9A84C'/%3E%3Cstop offset='1' stop-color='%237a6330'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='112' fill='url(%23bg)'/%3E%3Ccircle cx='256' cy='220' r='155' fill='none' stroke='url(%23rim)' stroke-width='14'/%3E%3Ccircle cx='256' cy='220' r='138' fill='%231a1408'/%3E%3Ctext x='256' y='268' font-family='Georgia%2C serif' font-size='148' font-weight='400' fill='url(%23rim)' text-anchor='middle' letter-spacing='2'%3EA%3C/text%3E%3Ccircle cx='256' cy='410' r='42' fill='none' stroke='url(%23rim)' stroke-width='10'/%3E%3Cellipse cx='256' cy='410' rx='18' ry='42' fill='none' stroke='url(%23rim)' stroke-width='6'/%3E%3Cline x1='214' y1='410' x2='298' y2='410' stroke='url(%23rim)' stroke-width='6'/%3E%3Cline x1='218' y1='390' x2='294' y2='390' stroke='url(%23rim)' stroke-width='4'/%3E%3Cline x1='218' y1='430' x2='294' y2='430' stroke='url(%23rim)' stroke-width='4'/%3E%3C/svg%3E">
+
+  <!-- Apple Touch Icon (180×180 PNG via Canvas generated at runtime, fallback SVG) -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3CradialGradient id='bg' cx='50%25' cy='35%25' r='65%25'%3E%3Cstop offset='0' stop-color='%23292217'/%3E%3Cstop offset='1' stop-color='%230e0e0f'/%3E%3C/radialGradient%3E%3CradialGradient id='rim' cx='50%25' cy='30%25' r='55%25'%3E%3Cstop offset='0' stop-color='%23E2C97E'/%3E%3Cstop offset='0.5' stop-color='%23C9A84C'/%3E%3Cstop offset='1' stop-color='%237a6330'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='112' fill='url(%23bg)'/%3E%3Ccircle cx='256' cy='220' r='155' fill='none' stroke='url(%23rim)' stroke-width='14'/%3E%3Ccircle cx='256' cy='220' r='138' fill='%231a1408'/%3E%3Ctext x='256' y='268' font-family='Georgia%2C serif' font-size='148' font-weight='400' fill='url(%23rim)' text-anchor='middle' letter-spacing='2'%3EA%3C/text%3E%3Ccircle cx='256' cy='410' r='42' fill='none' stroke='url(%23rim)' stroke-width='10'/%3E%3Cellipse cx='256' cy='410' rx='18' ry='42' fill='none' stroke='url(%23rim)' stroke-width='6'/%3E%3Cline x1='214' y1='410' x2='298' y2='410' stroke='url(%23rim)' stroke-width='6'/%3E%3Cline x1='218' y1='390' x2='294' y2='390' stroke='url(%23rim)' stroke-width='4'/%3E%3Cline x1='218' y1='430' x2='294' y2='430' stroke='url(%23rim)' stroke-width='4'/%3E%3C/svg%3E">
+
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold:        #C9A84C;
+      --gold-light:  #E2C97E;
+      --gold-dim:    #7a6330;
+      --bg:          #0e0e0f;
+      --bg2:         #141416;
+      --bg3:         #1a1a1d;
+      --surface:     #1e1e22;
+      --border:      rgba(201,168,76,0.18);
+      --border-hover:rgba(201,168,76,0.45);
+      --text:        #e8e2d4;
+      --text-dim:    #7a7468;
+      --text-muted:  #3e3c38;
+      --white:       #f5f0e8;
+      --danger:      #c0392b;
+      --danger-dim:  rgba(192,57,43,0.15);
+      --success:     #2e7d52;
+      --radius:      3px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-text-size-adjust: 100%; height: 100%; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      min-height: 100%;
+      min-height: -webkit-fill-available;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ── SUBTLE TEXTURE ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,168,76,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(201,168,76,0.04) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ══════════════════════════════════════
+       LANGUAGE SCREEN
+    ══════════════════════════════════════ */
+    #lang-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 32px 24px;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    #lang-screen.hide {
+      opacity: 0;
+      transform: translateY(-20px);
+      pointer-events: none;
+    }
+
+    .lang-logo {
+      text-align: center;
+      margin-bottom: 52px;
+    }
+    .lang-logo-mark {
+      display: inline-block;
+      width: 56px;
+      height: 56px;
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .lang-logo-mark::before {
+      content: 'A';
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem;
+      font-weight: 400;
+      color: var(--gold);
+      letter-spacing: 0.05em;
+    }
+    .lang-logo-mark::after {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border-radius: 50%;
+      border: 1px solid rgba(201,168,76,0.2);
+    }
+    .lang-brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 300;
+      letter-spacing: 0.3em;
+      color: var(--white);
+      text-transform: uppercase;
+      display: block;
+    }
+    .lang-tagline {
+      font-size: 0.62rem;
+      letter-spacing: 0.35em;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+      margin-top: 6px;
+      display: block;
+    }
+
+    .lang-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .lang-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+      max-width: 340px;
+    }
+    .lang-btn {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 14px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      text-align: left;
+      touch-action: manipulation;
+    }
+    .lang-btn:active {
+      background: rgba(201,168,76,0.08);
+      border-color: var(--gold);
+    }
+    .lang-flag {
+      font-size: 1.35rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .lang-name {
+      font-size: 0.82rem;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      color: var(--text);
+    }
+    .lang-native {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      margin-top: 1px;
+      letter-spacing: 0.04em;
+    }
+    /* 4 языка — ровная сетка 2×2 */
+
+    /* ══════════════════════════════════════
+       MAIN APP
+    ══════════════════════════════════════ */
+    #app {
+      position: relative;
+      z-index: 1;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.7s ease 0.1s, transform 0.7s ease 0.1s;
+      pointer-events: none;
+    }
+    #app.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+    }
+
+    /* HEADER */
+    .app-header {
+      padding: 28px 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 20px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--gold);
+      flex-shrink: 0;
+      position: relative;
+    }
+    .brand-mark::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      border: 1px solid rgba(201,168,76,0.18);
+    }
+    .brand-text {}
+    .brand-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-weight: 400;
+      letter-spacing: 0.22em;
+      color: var(--white);
+      text-transform: uppercase;
+      display: block;
+      line-height: 1;
+    }
+    .brand-sub {
+      font-size: 0.55rem;
+      letter-spacing: 0.28em;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+      margin-top: 3px;
+      display: block;
+    }
+
+    /* connection pill */
+    .conn-pill {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 13px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--bg2);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      touch-action: manipulation;
+    }
+    .conn-pill:active { background: var(--surface); border-color: var(--gold); }
+    .conn-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      transition: background 0.4s;
+      flex-shrink: 0;
+    }
+    .conn-dot.on { background: #4caf82; box-shadow: 0 0 6px #4caf8288; }
+    .conn-pill-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* CONTENT */
+    .content {
+      max-width: 560px;
+      margin: 0 auto;
+      padding: 28px 20px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* STATUS ROW */
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .status-device {
+      font-size: 0.62rem;
+      letter-spacing: 0.2em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+    .status-device span { color: var(--gold); }
+    .lang-switch {
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      cursor: pointer;
+      border-bottom: 1px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+      touch-action: manipulation;
+      padding-bottom: 1px;
+    }
+    .lang-switch:active { color: var(--gold); border-color: var(--gold); }
+
+    /* DIVIDER */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .divider-line { flex: 1; height: 1px; background: var(--border); }
+    .divider-label {
+      font-size: 0.58rem;
+      letter-spacing: 0.3em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    /* ROOM CARD */
+    .room-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+    .room-card.active { border-color: rgba(201,168,76,0.4); }
+
+    .room-header {
+      padding: 16px 20px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .room-title-wrap {}
+    .room-number {
+      font-size: 0.52rem;
+      letter-spacing: 0.3em;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 3px;
+    }
+    .room-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      color: var(--white);
+      line-height: 1;
+    }
+    .room-state {
+      font-size: 0.58rem;
+      letter-spacing: 0.22em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      text-align: right;
+    }
+    .room-state.moving { color: var(--gold); }
+
+    /* CONTROL PANEL — 3 columns */
+    .ctrl-panel {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    /* Room column */
+    .room-col {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: border-color 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+    .room-col.active { border-color: rgba(201,168,76,0.4); }
+
+    .room-col-header {
+      padding: 10px 6px 8px;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+      min-height: 78px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .room-number {
+      font-size: 0.44rem;
+      letter-spacing: 0.18em;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 4px;
+      white-space: nowrap;
+    }
+    .room-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      color: var(--white);
+      line-height: 1.2;
+      display: block;
+      text-align: center;
+    }
+    .room-state {
+      font-size: 0.44rem;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-top: 5px;
+      display: block;
+      white-space: nowrap;
+    }
+    .room-state.moving { color: var(--gold); }
+
+    /* Room buttons inside column */
+    .room-btns {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: 1px;
+      background: var(--border);
+    }
+    .ctrl-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 18px 8px;
+      flex: 1;
+      background: #181820;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s;
+      touch-action: manipulation;
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+    }
+    .ctrl-btn::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--gold);
+      transform: scaleX(0);
+      transition: transform 0.2s;
+      transform-origin: center;
+    }
+    .ctrl-btn:active:not(:disabled)::before { transform: scaleX(1); }
+    .ctrl-btn:active:not(:disabled) { background: rgba(201,168,76,0.07); }
+    .ctrl-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .ctrl-btn.pressed { background: rgba(201,168,76,0.1); }
+    .ctrl-btn.pressed::before { transform: scaleX(1); }
+
+    .ctrl-icon {
+      width: 38px;
+      height: 38px;
+      border: 1px solid rgba(201,168,76,0.45);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.2s, background 0.2s;
+      background: rgba(201,168,76,0.06);
+    }
+    .ctrl-btn:active:not(:disabled) .ctrl-icon,
+    .ctrl-btn.pressed .ctrl-icon {
+      border-color: var(--gold-light);
+      background: rgba(201,168,76,0.14);
+    }
+    .ctrl-icon svg { width: 15px; height: 15px; fill: none; stroke: var(--gold-light); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .ctrl-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      color: #c8bfa8;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    /* Center stop column */
+    .stop-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+    }
+    .stop-btn {
+      width: 100%;
+      flex: 1;
+      padding: 12px 6px;
+      background: var(--danger-dim);
+      border: 1px solid rgba(192,57,43,0.35);
+      border-radius: var(--radius);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background 0.15s, border-color 0.15s;
+      touch-action: manipulation;
+      min-height: 100%;
+    }
+    .stop-btn:active:not(:disabled) {
+      background: rgba(192,57,43,0.25);
+      border-color: rgba(192,57,43,0.6);
+    }
+    .stop-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .stop-icon {
+      width: 18px; height: 18px;
+      border: 1.5px solid rgba(192,57,43,0.7);
+      border-radius: 3px;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .stop-icon::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      background: rgba(192,57,43,0.6);
+      border-radius: 1px;
+    }
+    .stop-label {
+      font-size: 0.58rem;
+      letter-spacing: 0.18em;
+      color: rgba(220,100,90,0.85);
+      text-transform: uppercase;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      transform: rotate(180deg);
+    }
+
+    /* TELEMETRY */
+    .tele-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .tele-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+    }
+    .tele-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.25em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .tele-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem;
+      font-weight: 300;
+      color: var(--white);
+      line-height: 1;
+    }
+    .tele-unit {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 300;
+      color: var(--gold-dim);
+      letter-spacing: 0.15em;
+      margin-left: 2px;
+    }
+    .tele-bar {
+      margin-top: 10px;
+      height: 2px;
+      background: var(--border);
+      border-radius: 1px;
+      overflow: hidden;
+    }
+    .tele-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold-dim), var(--gold-light));
+      border-radius: 1px;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    /* CALIBRATE */
+    .calib-btn {
+      width: 100%;
+      padding: 13px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.63rem;
+      letter-spacing: 0.25em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 300;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+      touch-action: manipulation;
+    }
+    .calib-btn:active:not(:disabled) {
+      border-color: var(--gold-dim);
+      color: var(--gold);
+      background: rgba(201,168,76,0.05);
+    }
+    .calib-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+
+    /* LOG */
+    .log-wrap {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .log-head {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.55rem;
+      letter-spacing: 0.28em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .log-clear {
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: color 0.2s;
+      touch-action: manipulation;
+    }
+    .log-clear:active { color: var(--gold); }
+    .log-body {
+      padding: 10px 16px;
+      max-height: 90px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .log-body::-webkit-scrollbar { width: 2px; }
+    .log-body::-webkit-scrollbar-thumb { background: var(--gold-dim); }
+    .log-entry {
+      font-size: 0.62rem;
+      letter-spacing: 0.06em;
+      line-height: 1.8;
+      color: var(--text-dim);
+      font-weight: 300;
+    }
+    .log-entry.ok  { color: #4caf82; }
+    .log-entry.err { color: #c0392b; }
+    .log-entry.warn{ color: var(--gold-dim); }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 16px;
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      border-top: 1px solid var(--border);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* SECTION LABEL */
+    .section-label {
+      font-size: 0.58rem;
+      letter-spacing: 0.28em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: -6px;
+    }
+
+    /* ══════════════════════════════════════
+       MAIN MENU SCREEN
+    ══════════════════════════════════════ */
+    #main-menu {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: none;
+      flex-direction: column;
+      z-index: 500;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    #main-menu.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    #main-menu.hide {
+      opacity: 0;
+      transform: translateY(-16px);
+      pointer-events: none;
+    }
+
+    .mm-header {
+      padding: 24px 22px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .mm-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .mm-brand-mark {
+      width: 34px; height: 34px;
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem; color: var(--gold);
+      position: relative; flex-shrink: 0;
+    }
+    .mm-brand-mark::after {
+      content: '';
+      position: absolute; inset: 3px;
+      border-radius: 50%;
+      border: 1px solid rgba(201,168,76,0.18);
+    }
+    .mm-brand-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem; font-weight: 400;
+      letter-spacing: 0.22em; color: var(--white);
+      text-transform: uppercase; display: block; line-height: 1;
+    }
+    .mm-brand-sub {
+      font-size: 0.52rem; letter-spacing: 0.26em;
+      color: var(--gold-dim); text-transform: uppercase;
+      margin-top: 3px; display: block;
+    }
+    .mm-conn-pill {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 13px;
+      border: 1px solid var(--border); border-radius: 20px;
+      background: var(--bg2);
+      cursor: pointer; touch-action: manipulation;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .mm-conn-pill:active { background: var(--surface); border-color: var(--gold); }
+
+    .mm-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 28px 22px;
+      gap: 14px;
+      max-width: 480px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Big action buttons */
+    .mm-btn {
+      width: 100%;
+      padding: 26px 22px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: background 0.15s, border-color 0.2s;
+      position: relative;
+      overflow: hidden;
+      text-align: left;
+    }
+    .mm-btn::after {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--gold);
+      transform: scaleY(0);
+      transform-origin: center;
+      transition: transform 0.2s;
+    }
+    .mm-btn:active:not(:disabled)::after { transform: scaleY(1); }
+    .mm-btn:active:not(:disabled) { background: rgba(201,168,76,0.06); border-color: rgba(201,168,76,0.35); }
+    .mm-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .mm-btn-icon {
+      width: 48px; height: 48px;
+      border: 1px solid rgba(201,168,76,0.4);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(201,168,76,0.06);
+      flex-shrink: 0;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .mm-btn:active:not(:disabled) .mm-btn-icon {
+      border-color: var(--gold-light);
+      background: rgba(201,168,76,0.12);
+    }
+    .mm-btn-icon svg {
+      width: 20px; height: 20px;
+      fill: none; stroke: var(--gold-light);
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .mm-btn.mm-stop .mm-btn-icon svg { stroke: rgba(220,100,90,0.9); fill: rgba(192,57,43,0.35); }
+    .mm-btn-text {}
+    .mm-btn-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem; font-weight: 400;
+      letter-spacing: 0.08em;
+      color: var(--white);
+      display: block; line-height: 1.1;
+    }
+    .mm-btn-desc {
+      font-size: 0.6rem; letter-spacing: 0.18em;
+      color: var(--text-dim); text-transform: uppercase;
+      margin-top: 4px; display: block;
+    }
+
+    /* Stop button — red accent */
+    .mm-btn.mm-stop {
+      border-color: rgba(192,57,43,0.3);
+      background: rgba(192,57,43,0.06);
+    }
+    .mm-btn.mm-stop::after { background: #c0392b; }
+    .mm-btn.mm-stop:active:not(:disabled) {
+      background: rgba(192,57,43,0.14);
+      border-color: rgba(192,57,43,0.55);
+    }
+    .mm-btn.mm-stop .mm-btn-icon {
+      border-color: rgba(192,57,43,0.5);
+      background: rgba(192,57,43,0.08);
+    }
+    .mm-btn.mm-stop:active:not(:disabled) .mm-btn-icon {
+      border-color: #c0392b;
+      background: rgba(192,57,43,0.18);
+    }
+    .mm-btn.mm-stop .mm-btn-icon svg { stroke: rgba(220,100,90,0.9); }
+    .mm-btn.mm-stop .mm-btn-title { color: rgba(220,180,175,0.9); }
+
+    /* Advanced menu link */
+    .mm-advanced {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 13px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .mm-advanced:active { background: rgba(201,168,76,0.05); border-color: rgba(201,168,76,0.3); }
+    .mm-advanced-label {
+      font-size: 0.62rem; letter-spacing: 0.22em;
+      color: var(--text-muted); text-transform: uppercase;
+    }
+    .mm-advanced svg {
+      width: 12px; height: 12px;
+      fill: none; stroke: var(--text-muted);
+      stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    .mm-footer {
+      text-align: center; padding: 14px;
+      font-size: 0.52rem; letter-spacing: 0.18em;
+      color: var(--text-muted); text-transform: uppercase;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     LANGUAGE SELECTION SCREEN
+══════════════════════════════════════ -->
+<div id="lang-screen">
+  <div class="lang-logo">
+    <div class="lang-logo-mark"></div>
+    <span class="lang-brand">Aurum Globe</span>
+    <span class="lang-tagline">Precision Control System</span>
+  </div>
+
+  <div class="lang-label" id="lang-prompt">Select language</div>
+
+  <div class="lang-grid">
+    <button class="lang-btn" onclick="selectLang('en')">
+      <span class="lang-flag">🇬🇧</span>
+      <div><div class="lang-name">English</div><div class="lang-native">English</div></div>
+    </button>
+    <button class="lang-btn" onclick="selectLang('de')">
+      <span class="lang-flag">🇩🇪</span>
+      <div><div class="lang-name">German</div><div class="lang-native">Deutsch</div></div>
+    </button>
+    <button class="lang-btn" onclick="selectLang('pl')">
+      <span class="lang-flag">🇵🇱</span>
+      <div><div class="lang-name">Polish</div><div class="lang-native">Polski</div></div>
+    </button>
+    <button class="lang-btn" onclick="selectLang('uk')">
+      <span class="lang-flag">🇺🇦</span>
+      <div><div class="lang-name">Ukrainian</div><div class="lang-native">Українська</div></div>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MAIN MENU
+══════════════════════════════════════ -->
+<div id="main-menu">
+
+  <header class="mm-header">
+    <div class="mm-brand">
+      <div class="mm-brand-mark">A</div>
+      <div>
+        <span class="mm-brand-name">Aurum Globe</span>
+        <span class="mm-brand-sub" id="mm-hdr-sub">Control System</span>
+      </div>
+    </div>
+    <div class="mm-conn-pill" id="mmConnPill" onclick="toggleConnect()">
+      <div class="conn-dot" id="mm-dot"></div>
+      <span class="conn-pill-label" id="mm-conn-label">Connect</span>
+    </div>
+  </header>
+
+  <div class="mm-body">
+
+    <!-- Розкласти будинок — стрілки від центру назовні -->
+    <button class="mm-btn" id="mm-open" onclick="cmdBoth('open')" disabled>
+      <div class="mm-btn-icon">
+        <svg viewBox="0 0 24 24">
+          <line x1="12" y1="12" x2="5" y2="12"/>
+          <polyline points="8 9 5 12 8 15"/>
+          <line x1="12" y1="12" x2="19" y2="12"/>
+          <polyline points="16 9 19 12 16 15"/>
+        </svg>
+      </div>
+      <div class="mm-btn-text">
+        <span class="mm-btn-title" id="mm-lbl-open">Unfold House</span>
+        <span class="mm-btn-desc" id="mm-lbl-open-desc">Open both rooms simultaneously</span>
+      </div>
+    </button>
+
+    <!-- Скласти будинок — стрілки до центру -->
+    <button class="mm-btn" id="mm-close" onclick="cmdBoth('close')" disabled>
+      <div class="mm-btn-icon">
+        <svg viewBox="0 0 24 24">
+          <line x1="5" y1="12" x2="12" y2="12"/>
+          <polyline points="9 9 12 12 9 15"/>
+          <line x1="19" y1="12" x2="12" y2="12"/>
+          <polyline points="15 9 12 12 15 15"/>
+        </svg>
+      </div>
+      <div class="mm-btn-text">
+        <span class="mm-btn-title" id="mm-lbl-close">Fold House</span>
+        <span class="mm-btn-desc" id="mm-lbl-close-desc">Close both rooms simultaneously</span>
+      </div>
+    </button>
+
+    <!-- Стоп -->
+    <button class="mm-btn mm-stop" id="mm-stop" onclick="sendCmd('STOP')" disabled>
+      <div class="mm-btn-icon">
+        <svg viewBox="0 0 24 24">
+          <rect x="4" y="4" width="16" height="16" rx="2"/>
+        </svg>
+      </div>
+      <div class="mm-btn-text">
+        <span class="mm-btn-title" id="mm-lbl-stop">Stop</span>
+        <span class="mm-btn-desc" id="mm-lbl-stop-desc">Stop all movement</span>
+      </div>
+    </button>
+
+    <button class="mm-advanced" onclick="showAdvanced()">
+      <span class="mm-advanced-label" id="mm-lbl-advanced">Advanced control</span>
+      <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+
+  </div>
+
+  <div class="mm-footer">Aurum Globe &copy; 2024</div>
+
+</div>
+
+<!-- ══════════════════════════════════════
+     MAIN APP (Advanced)
+══════════════════════════════════════ -->
+<div id="app">
+
+  <header class="app-header">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <button onclick="showMainMenu()" style="background:none;border:none;cursor:pointer;padding:6px 10px 6px 0;display:flex;align-items:center;gap:6px;touch-action:manipulation;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        <span style="font-size:0.58rem;letter-spacing:0.2em;color:var(--gold-dim);text-transform:uppercase;" id="adv-back-lbl">Back</span>
+      </button>
+      <div class="brand-text">
+        <span class="brand-name">Aurum Globe</span>
+        <span class="brand-sub" id="hdr-sub">Advanced</span>
+      </div>
+    </div>
+    <div class="conn-pill" id="connPill" onclick="toggleConnect()">
+      <div class="conn-dot" id="dot"></div>
+      <span class="conn-pill-label" id="connPillLabel">Connect</span>
+    </div>
+  </header>
+  <div class="content">
+
+    <!-- STATUS ROW -->
+    <div class="status-row">
+      <div class="status-device" id="status-device">—</div>
+      <div class="lang-switch" onclick="showLangScreen()" id="lang-switch-btn">🌐 Language</div>
+    </div>
+
+    <!-- ROOM LEFT -->
+    <div>
+      <div class="section-label" id="lbl-rooms">Rooms</div>
+    </div>
+
+    <!-- CONTROL PANEL: Left Room | Stop | Right Room -->
+    <div class="ctrl-panel">
+
+      <!-- LEFT: Room Left -->
+      <div class="room-col" id="card1">
+        <div class="room-col-header">
+          <span class="room-number" id="r1-num">Room 01</span>
+          <span class="room-name" id="r1-name">Room Left</span>
+          <span class="room-state" id="r1-state">Idle</span>
+        </div>
+        <div class="room-btns">
+          <button class="ctrl-btn" id="b1l" onclick="sendCmd('1L')" disabled>
+            <div class="ctrl-icon">
+              <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            </div>
+            <span class="ctrl-label" id="lbl-open">Open</span>
+          </button>
+          <button class="ctrl-btn" id="b1r" onclick="sendCmd('1R')" disabled>
+            <div class="ctrl-icon">
+              <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+            <span class="ctrl-label" id="lbl-close">Close</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- CENTER: Stop -->
+      <div class="stop-col">
+        <button class="stop-btn" id="bStop" onclick="sendCmd('STOP')" disabled>
+          <div class="stop-icon"></div>
+          <span class="stop-label" id="lbl-stop">Stop</span>
+        </button>
+      </div>
+
+      <!-- RIGHT: Room Right -->
+      <div class="room-col" id="card2">
+        <div class="room-col-header">
+          <span class="room-number" id="r2-num">Room 02</span>
+          <span class="room-name" id="r2-name">Room Right</span>
+          <span class="room-state" id="r2-state">Idle</span>
+        </div>
+        <div class="room-btns">
+          <button class="ctrl-btn" id="b2l" onclick="sendCmd('2L')" disabled>
+            <div class="ctrl-icon">
+              <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+            <span class="ctrl-label" id="lbl-open2">Open</span>
+          </button>
+          <button class="ctrl-btn" id="b2r" onclick="sendCmd('2R')" disabled>
+            <div class="ctrl-icon">
+              <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            </div>
+            <span class="ctrl-label" id="lbl-close2">Close</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TELEMETRY — temporarily hidden, uncomment to restore
+    <div class="divider">
+      <div class="divider-line"></div>
+      <div class="divider-label" id="lbl-tele">Telemetry</div>
+      <div class="divider-line"></div>
+    </div>
+
+    <div class="tele-grid">
+      <div class="tele-card">
+        <div class="tele-label" id="lbl-ch-left">Channel Left</div>
+        <div class="tele-value" id="cL">—<span class="tele-unit">A</span></div>
+        <div class="tele-bar"><div class="tele-fill" id="bL"></div></div>
+      </div>
+      <div class="tele-card">
+        <div class="tele-label" id="lbl-ch-right">Channel Right</div>
+        <div class="tele-value" id="cR">—<span class="tele-unit">A</span></div>
+        <div class="tele-bar"><div class="tele-fill" id="bR"></div></div>
+      </div>
+    </div>
+
+    <button class="calib-btn" id="bCal" onclick="sendCmd('CAL')" disabled>
+      <span id="lbl-calib">↺ Calibrate sensors</span>
+    </button>
+    -->
+
+    <!-- LOG -->
+    <div class="log-wrap">
+      <div class="log-head">
+        <span id="lbl-log">System log</span>
+        <span class="log-clear" onclick="clearLog()" id="lbl-clear">Clear</span>
+      </div>
+      <div class="log-body" id="logEl">
+        <div class="log-entry" id="log-init-msg">System ready. Awaiting connection.</div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <footer>
+    <span>Aurum Globe &copy; 2024</span>
+  </footer>
+
+</div><!-- /app -->
+
+<script>
+// ============================================================
+//  TRANSLATIONS
+// ============================================================
+const T = {
+  en: {
+    hdrSub:      'Control System',
+    langSwitch:  '🌐 Language',
+    connect:     'Connect',
+    disconnect:  'Disconnect',
+    connected:   'Connected',
+    noDevice:    '—',
+    r1num:       'Room 01',
+    r1name:      'Left<br>Room',
+    r2num:       'Room 02',
+    r2name:      'Right<br>Room',
+    open:        'Open',
+    close:       'Close',
+    stopAll:     'Stop All',
+    idle:        'Idle',
+    moving:      'Moving…',
+    tele:        'Telemetry',
+    chLeft:      'Channel Left',
+    chRight:     'Channel Right',
+    calib:       '↺ Calibrate sensors',
+    log:         'System log',
+    clear:       'Clear',
+    rooms:       'Rooms',
+    logReady:    'System ready. Awaiting connection.',
+    logScanning: 'Scanning for device…',
+    logFound:    'Device found:',
+    logGatt:     'GATT service connected.',
+    logOnline:   'Connection established. Systems online.',
+    logDisc:     'Device disconnected.',
+    logClosed:   'Connection closed.',
+    logNoApi:    'Bluetooth API not supported. Use Chrome or Bluefy (iOS).',
+    logCancelled:'Device selection cancelled.',
+    logError:    'Error:',
+    logNoConn:   'Not connected.',
+    logCalib:    'Sensors calibrated.',
+    logStop:     'All stopped.',
+    logCmd:      'Command sent:',
+    logNotify:   'Telemetry active.',
+    mmOpen:      'Unfold House',
+    mmOpenDesc:  'Open both rooms simultaneously',
+    mmClose:     'Fold House',
+    mmCloseDesc: 'Close both rooms simultaneously',
+    mmStop:      'Stop',
+    mmStopDesc:  'Stop all movement',
+    mmAdvanced:  'Advanced control',
+    mmBack:      'Back',
+  },
+  de: {
+    hdrSub:      'Steuerungssystem',
+    langSwitch:  '🌐 Sprache',
+    connect:     'Verbinden',
+    disconnect:  'Trennen',
+    connected:   'Verbunden',
+    noDevice:    '—',
+    r1num:       'Raum 01',
+    r1name:      'Links<br>Raum',
+    r2num:       'Raum 02',
+    r2name:      'Rechts<br>Raum',
+    open:        'Öffnen',
+    close:       'Schließen',
+    stopAll:     'Alles stoppen',
+    idle:        'Bereit',
+    moving:      'In Bewegung…',
+    tele:        'Telemetrie',
+    chLeft:      'Kanal Links',
+    chRight:     'Kanal Rechts',
+    calib:       '↺ Sensoren kalibrieren',
+    log:         'Systemprotokoll',
+    clear:       'Löschen',
+    rooms:       'Räume',
+    logReady:    'System bereit. Warte auf Verbindung.',
+    logScanning: 'Suche nach Gerät…',
+    logFound:    'Gerät gefunden:',
+    logGatt:     'GATT-Dienst verbunden.',
+    logOnline:   'Verbindung hergestellt.',
+    logDisc:     'Gerät getrennt.',
+    logClosed:   'Verbindung geschlossen.',
+    logNoApi:    'Bluetooth API nicht unterstützt. Chrome oder Bluefy (iOS) verwenden.',
+    logCancelled:'Geräteauswahl abgebrochen.',
+    logError:    'Fehler:',
+    logNoConn:   'Nicht verbunden.',
+    logCalib:    'Sensoren kalibriert.',
+    logStop:     'Alles gestoppt.',
+    logCmd:      'Befehl gesendet:',
+    logNotify:   'Telemetrie aktiv.',
+    mmOpen:      'Haus ausfalten',
+    mmOpenDesc:  'Beide Räume gleichzeitig öffnen',
+    mmClose:     'Haus einfalten',
+    mmCloseDesc: 'Beide Räume gleichzeitig schließen',
+    mmStop:      'Stopp',
+    mmStopDesc:  'Alle Bewegungen stoppen',
+    mmAdvanced:  'Erweiterte Steuerung',
+    mmBack:      'Zurück',
+  },
+  pl: {
+    hdrSub:      'System sterowania',
+    langSwitch:  '🌐 Język',
+    connect:     'Połącz',
+    disconnect:  'Rozłącz',
+    connected:   'Połączono',
+    noDevice:    '—',
+    r1num:       'Pokój 01',
+    r1name:      'Lewy<br>Pokój',
+    r2num:       'Pokój 02',
+    r2name:      'Prawy<br>Pokój',
+    open:        'Otwórz',
+    close:       'Zamknij',
+    stopAll:     'Zatrzymaj',
+    idle:        'Gotowy',
+    moving:      'W ruchu…',
+    tele:        'Telemetria',
+    chLeft:      'Kanał lewy',
+    chRight:     'Kanał prawy',
+    calib:       '↺ Kalibruj czujniki',
+    log:         'Dziennik systemu',
+    clear:       'Wyczyść',
+    rooms:       'Pokoje',
+    logReady:    'System gotowy. Oczekiwanie na połączenie.',
+    logScanning: 'Wyszukiwanie urządzenia…',
+    logFound:    'Znaleziono urządzenie:',
+    logGatt:     'Usługa GATT połączona.',
+    logOnline:   'Połączenie nawiązane.',
+    logDisc:     'Urządzenie rozłączone.',
+    logClosed:   'Połączenie zamknięte.',
+    logNoApi:    'Bluetooth API nieobsługiwane. Użyj Chrome lub Bluefy (iOS).',
+    logCancelled:'Wybór urządzenia anulowany.',
+    logError:    'Błąd:',
+    logNoConn:   'Brak połączenia.',
+    logCalib:    'Czujniki skalibrowane.',
+    logStop:     'Wszystko zatrzymane.',
+    logCmd:      'Polecenie wysłane:',
+    logNotify:   'Telemetria aktywna.',
+    mmOpen:      'Rozłóż dom',
+    mmOpenDesc:  'Otwórz oba pokoje jednocześnie',
+    mmClose:     'Złóż dom',
+    mmCloseDesc: 'Zamknij oba pokoje jednocześnie',
+    mmStop:      'Stop',
+    mmStopDesc:  'Zatrzymaj wszystkie ruchy',
+    mmAdvanced:  'Sterowanie zaawansowane',
+    mmBack:      'Wróć',
+  },
+  uk: {
+    hdrSub:      'Система керування',
+    langSwitch:  '🌐 Мова',
+    connect:     "З'єднати",
+    disconnect:  'Відключити',
+    connected:   "З'єднано",
+    noDevice:    '—',
+    r1num:       'Кімната 01',
+    r1name:      'Ліва<br>Кімната',
+    r2num:       'Кімната 02',
+    r2name:      'Права<br>Кімната',
+    open:        'Відкрити',
+    close:       'Закрити',
+    stopAll:     'Зупинити все',
+    idle:        'Готово',
+    moving:      'Рухається…',
+    tele:        'Телеметрія',
+    chLeft:      'Канал лівий',
+    chRight:     'Канал правий',
+    calib:       '↺ Калібрування',
+    log:         'Журнал системи',
+    clear:       'Очистити',
+    rooms:       'Кімнати',
+    logReady:    'Система готова. Очікування з\'єднання.',
+    logScanning: 'Пошук пристрою…',
+    logFound:    'Пристрій знайдено:',
+    logGatt:     'GATT-сервіс підключено.',
+    logOnline:   "З'єднання встановлено.",
+    logDisc:     'Пристрій відключився.',
+    logClosed:   "З'єднання закрито.",
+    logNoApi:    'Bluetooth API не підтримується. Використовуйте Chrome або Bluefy (iOS).',
+    logCancelled:'Вибір пристрою скасовано.',
+    logError:    'Помилка:',
+    logNoConn:   'Немає з\'єднання.',
+    logCalib:    'Датчики відкалібровано.',
+    logStop:     'Все зупинено.',
+    logCmd:      'Команда надіслана:',
+    logNotify:   'Телеметрія активна.',
+    mmOpen:      'Розкласти будинок',
+    mmOpenDesc:  'Відкрити обидві кімнати одночасно',
+    mmClose:     'Скласти будинок',
+    mmCloseDesc: 'Закрити обидві кімнати одночасно',
+    mmStop:      'Стоп',
+    mmStopDesc:  'Зупинити весь рух',
+    mmAdvanced:  'Розширене керування',
+    mmBack:      'Назад',
+  }
+};
+
+let lang = 'en';
+
+function t(key) { return (T[lang] && T[lang][key]) || T.en[key] || key; }
+
+// Безопасный хелпер — не падает если элемент скрыт комментарием
+function setEl(id, value, prop) {
+  const el = document.getElementById(id);
+  if (el) el[prop || 'textContent'] = value;
+}
+
+function applyLang() {
+  setEl('hdr-sub',         t('hdrSub'));
+  setEl('lang-switch-btn', t('langSwitch'));
+  setEl('connPillLabel',   connected ? t('disconnect') : t('connect'));
+  setEl('lbl-rooms',       t('rooms'));
+  setEl('r1-num',          t('r1num'));
+  setEl('r1-name',         t('r1name'), 'innerHTML');
+  setEl('r2-num',          t('r2num'));
+  setEl('r2-name',         t('r2name'), 'innerHTML');
+  setEl('lbl-open',        t('open'));
+  setEl('lbl-close',       t('close'));
+  setEl('lbl-open2',       t('open'));
+  setEl('lbl-close2',      t('close'));
+  setEl('lbl-stop',        t('stopAll'));
+  setEl('lbl-tele',        t('tele'));
+  setEl('lbl-ch-left',     t('chLeft'));
+  setEl('lbl-ch-right',    t('chRight'));
+  setEl('lbl-calib',       t('calib'));
+  setEl('lbl-log',         t('log'));
+  setEl('lbl-clear',       t('clear'));
+  // Main menu
+  setEl('mm-hdr-sub',      t('hdrSub'));
+  setEl('mm-conn-label',   connected ? t('disconnect') : t('connect'));
+  setEl('mm-lbl-open',     t('mmOpen'));
+  setEl('mm-lbl-open-desc',t('mmOpenDesc'));
+  setEl('mm-lbl-close',    t('mmClose'));
+  setEl('mm-lbl-close-desc',t('mmCloseDesc'));
+  setEl('mm-lbl-stop',     t('mmStop'));
+  setEl('mm-lbl-stop-desc',t('mmStopDesc'));
+  setEl('mm-lbl-advanced', t('mmAdvanced'));
+  setEl('adv-back-lbl',    t('mmBack'));
+
+  ['r1-state','r2-state'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !el.classList.contains('moving')) el.textContent = t('idle');
+  });
+}
+
+// ============================================================
+//  LANGUAGE SCREEN
+// ============================================================
+function selectLang(l) {
+  lang = l;
+  applyLang();
+  const ls = document.getElementById('lang-screen');
+  ls.classList.add('hide');
+  setTimeout(() => { ls.style.display = 'none'; }, 650);
+  showMainMenu();
+}
+
+function showLangScreen() {
+  // Hide all screens
+  document.getElementById('main-menu').style.display = 'none';
+  document.getElementById('app').classList.remove('visible');
+  const ls = document.getElementById('lang-screen');
+  ls.style.display = 'flex';
+  ls.style.opacity = '0';
+  ls.style.transform = 'translateY(-20px)';
+  ls.classList.remove('hide');
+  requestAnimationFrame(() => {
+    ls.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+    ls.style.opacity = '1';
+    ls.style.transform = 'translateY(0)';
+  });
+}
+
+function showMainMenu() {
+  // Hide advanced
+  document.getElementById('app').classList.remove('visible');
+  setTimeout(() => { document.getElementById('app').style.display = 'none'; }, 300);
+  // Show main menu
+  const mm = document.getElementById('main-menu');
+  mm.style.display = 'flex';
+  requestAnimationFrame(() => mm.classList.add('visible'));
+  addLog(t('logReady'));
+}
+
+function showAdvanced() {
+  // Hide main menu
+  const mm = document.getElementById('main-menu');
+  mm.classList.remove('visible');
+  mm.classList.add('hide');
+  setTimeout(() => {
+    mm.style.display = 'none';
+    mm.classList.remove('hide');
+  }, 350);
+  // Show advanced
+  const app = document.getElementById('app');
+  app.style.display = 'block';
+  requestAnimationFrame(() => app.classList.add('visible'));
+}
+
+// Send both rooms open or close
+async function cmdBoth(action) {
+  if (action === 'open') {
+    await sendCmd('1L');
+    setTimeout(() => sendCmd('2L'), 80);
+  } else {
+    await sendCmd('1R');
+    setTimeout(() => sendCmd('2R'), 80);
+  }
+}
+
+// ============================================================
+//  BLE
+// ============================================================
+const SVC_UUID = '12345678-1234-1234-1234-123456789012';
+const CMD_UUID = '12345678-1234-1234-1234-123456789013';
+const STA_UUID = '12345678-1234-1234-1234-123456789014';
+
+let device = null, cmdChar = null, staChar = null, connected = false;
+
+function addLog(msg, type='') {
+  const el = document.getElementById('logEl');
+  const ts = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+  const d = document.createElement('div');
+  d.className = 'log-entry' + (type ? ' ' + type : '');
+  d.textContent = ts + '  ' + msg;
+  el.appendChild(d);
+  el.scrollTop = el.scrollHeight;
+}
+
+function clearLog() {
+  document.getElementById('logEl').innerHTML = '';
+}
+
+function setConnected(on) {
+  connected = on;
+  // Advanced screen dots & pill
+  document.getElementById('dot').classList.toggle('on', on);
+  document.getElementById('connPillLabel').textContent = on ? t('disconnect') : t('connect');
+  // Main menu dot & pill
+  const mmDot = document.getElementById('mm-dot');
+  if (mmDot) mmDot.classList.toggle('on', on);
+  setEl('mm-conn-label', on ? t('disconnect') : t('connect'));
+  // Advanced buttons
+  ['b1l','b1r','b2l','b2r','bStop'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.disabled = !on;
+  });
+  const bCal = document.getElementById('bCal');
+  if (bCal) bCal.disabled = !on;
+  // Main menu buttons
+  ['mm-open','mm-close','mm-stop'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.disabled = !on;
+  });
+  if (!on) {
+    document.getElementById('status-device').innerHTML = t('noDevice');
+    clearRoomStates();
+    resetMeters();
+  }
+}
+
+function clearRoomStates() {
+  ['r1-state','r2-state'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.classList.remove('moving'); el.textContent = t('idle'); }
+  });
+  ['b1l','b1r','b2l','b2r'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('pressed');
+  });
+  ['card1','card2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+}
+function resetMeters() {
+  // Элементы могут отсутствовать если телеметрия скрыта
+  const cL = document.getElementById('cL');
+  const cR = document.getElementById('cR');
+  const bL = document.getElementById('bL');
+  const bR = document.getElementById('bR');
+  if (cL) cL.innerHTML = '—<span class="tele-unit">A</span>';
+  if (cR) cR.innerHTML = '—<span class="tele-unit">A</span>';
+  if (bL) bL.style.width = '0%';
+  if (bR) bR.style.width = '0%';
+}
+
+function setRoomMoving(btnId) {
+  clearRoomStates();
+  // Determine which room
+  const isRoom1 = btnId === 'b1l' || btnId === 'b1r';
+  const stateId = isRoom1 ? 'r1-state' : 'r2-state';
+  const cardId  = isRoom1 ? 'card1' : 'card2';
+  document.getElementById(stateId).textContent = t('moving');
+  document.getElementById(stateId).classList.add('moving');
+  document.getElementById(cardId).classList.add('active');
+  document.getElementById(btnId).classList.add('pressed');
+}
+
+// ── флаг: пользователь сам нажал Disconnect (не переподключаем)
+let userDisconnected = false;
+let reconnectTimer   = null;
+const RECONNECT_DELAY_MS = 1500;  // ждём пока ESP32 перезапустит рекламу
+
+async function toggleConnect() {
+  if (connected) { doDisconnect(); return; }
+  if (!navigator.bluetooth) {
+    addLog(t('logNoApi'), 'err'); return;
+  }
+  clearTimeout(reconnectTimer);
+  userDisconnected = false;
+  document.getElementById('connPill').style.pointerEvents = 'none';
+  addLog(t('logScanning'), 'warn');
+  try {
+    // requestDevice показывает диалог выбора ТОЛЬКО при первом подключении.
+    // При повторном — device уже запомнен браузером, диалог не нужен.
+    device = await navigator.bluetooth.requestDevice({
+      filters: [{ name: 'Aurum-Rooms' }],
+      optionalServices: [SVC_UUID]
+    });
+    addLog(t('logFound') + ' ' + device.name);
+    // Убираем старый listener чтобы не дублировался
+    device.removeEventListener('gattserverdisconnected', onDisconnected);
+    device.addEventListener('gattserverdisconnected', onDisconnected);
+    await doGattConnect();
+  } catch(e) {
+    const msg = e.message || '';
+    if (msg.toLowerCase().includes('cancel') || msg.toLowerCase().includes('chosen')) {
+      addLog(t('logCancelled'), 'warn');
+    } else {
+      addLog(t('logError') + ' ' + msg, 'err');
+    }
+    setConnected(false);
+  }
+  document.getElementById('connPill').style.pointerEvents = '';
+}
+
+// Отдельная функция GATT — вызывается и при первом коннекте, и при авто-реконнекте
+async function doGattConnect() {
+  try {
+    const server  = await device.gatt.connect();
+    const service = await server.getPrimaryService(SVC_UUID);
+    cmdChar = await service.getCharacteristic(CMD_UUID);
+    staChar = await service.getCharacteristic(STA_UUID);
+    // removeEventListener перед add — защита от дублей
+    staChar.removeEventListener('characteristicvaluechanged', onNotify);
+    await staChar.startNotifications();
+    staChar.addEventListener('characteristicvaluechanged', onNotify);
+    setConnected(true);
+    document.getElementById('connPill').style.pointerEvents = '';
+    document.getElementById('status-device').innerHTML =
+      '<span>' + (device.name || 'Aurum-Rooms') + '</span>';
+    addLog(t('logOnline'), 'ok');
+  } catch(e) {
+    addLog(t('logError') + ' ' + (e.message || ''), 'err');
+    setConnected(false);
+    document.getElementById('connPill').style.pointerEvents = '';
+  }
+}
+
+function doDisconnect() {
+  userDisconnected = true;
+  clearTimeout(reconnectTimer);
+  if (device && device.gatt.connected) device.gatt.disconnect();
+  setConnected(false);
+  addLog(t('logClosed'), 'warn');
+}
+
+function onDisconnected() {
+  setConnected(false);
+  if (userDisconnected) return;  // пользователь сам отключил — не реконнектим
+
+  addLog(t('logDisc') + ' — reconnecting...', 'warn');
+
+  // Ждём ADV_DELAY_MS (ESP32 перезапускает рекламу) + небольшой запас
+  reconnectTimer = setTimeout(async () => {
+    if (connected || userDisconnected || !device) return;
+    addLog(t('logScanning'), 'warn');
+    await doGattConnect();
+  }, RECONNECT_DELAY_MS);
+}
+
+function onNotify(evt) {
+  try {
+    const str = new TextDecoder().decode(evt.target.value).trim();
+    const m = str.match(/L:([-\d.]+),R:([-\d.]+)/);
+    if (m) {
+      const iL = parseFloat(m[1]), iR = parseFloat(m[2]);
+      const cL = document.getElementById('cL');
+      const cR = document.getElementById('cR');
+      const bL = document.getElementById('bL');
+      const bR = document.getElementById('bR');
+      if (cL) cL.innerHTML = iL.toFixed(2) + '<span class="tele-unit">A</span>';
+      if (cR) cR.innerHTML = iR.toFixed(2) + '<span class="tele-unit">A</span>';
+      if (bL) bL.style.width = Math.min(Math.abs(iL)/50*100,100)+'%';
+      if (bR) bR.style.width = Math.min(Math.abs(iR)/50*100,100)+'%';
+    }
+  } catch(_) {}
+}
+
+// ============================================================
+//  GENERATE APPLE TOUCH ICON via Canvas (180×180 PNG)
+//  iOS picks up <link rel="apple-touch-icon"> only if it's a real PNG.
+//  We draw it on a canvas and inject the data URL at runtime.
+// ============================================================
+(function generateAppleIcon() {
+  try {
+    const S = 180;
+    const c = document.createElement('canvas');
+    c.width = c.height = S;
+    const ctx = c.getContext('2d');
+
+    // Background
+    const bgGrad = ctx.createRadialGradient(S*0.5, S*0.3, 0, S*0.5, S*0.5, S*0.75);
+    bgGrad.addColorStop(0, '#252010');
+    bgGrad.addColorStop(1, '#0e0e0f');
+    ctx.beginPath();
+    const r = S * 0.22;
+    ctx.moveTo(r, 0);
+    ctx.lineTo(S - r, 0);
+    ctx.arcTo(S, 0, S, r, r);
+    ctx.lineTo(S, S - r);
+    ctx.arcTo(S, S, S - r, S, r);
+    ctx.lineTo(r, S);
+    ctx.arcTo(0, S, 0, S - r, r);
+    ctx.lineTo(0, r);
+    ctx.arcTo(0, 0, r, 0, r);
+    ctx.closePath();
+    ctx.fillStyle = bgGrad;
+    ctx.fill();
+
+    // Gold gradient helper
+    function goldGrad(x1,y1,x2,y2) {
+      const g = ctx.createLinearGradient(x1,y1,x2,y2);
+      g.addColorStop(0,   '#E8D080');
+      g.addColorStop(0.45,'#C9A84C');
+      g.addColorStop(1,   '#7a6330');
+      return g;
+    }
+
+    // Outer ring
+    const cx = S / 2, cy = S * 0.44, rad = S * 0.30;
+    ctx.beginPath();
+    ctx.arc(cx, cy, rad, 0, Math.PI * 2);
+    ctx.strokeStyle = goldGrad(cx - rad, cy, cx + rad, cy);
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    // Inner ring (subtle)
+    ctx.beginPath();
+    ctx.arc(cx, cy, rad - 8, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(201,168,76,0.2)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Dark fill inside circle
+    ctx.beginPath();
+    ctx.arc(cx, cy, rad - 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#100e08';
+    ctx.fill();
+
+    // Letter A
+    ctx.font = '600 ' + Math.round(S * 0.32) + 'px Georgia, serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const ag = goldGrad(cx - 20, cy - 20, cx + 20, cy + 20);
+    ctx.fillStyle = ag;
+    ctx.fillText('A', cx, cy + S * 0.015);
+
+    // Globe below
+    const gx = cx, gy = S * 0.83, gr = S * 0.1;
+
+    // Globe circle
+    ctx.beginPath();
+    ctx.arc(gx, gy, gr, 0, Math.PI * 2);
+    ctx.strokeStyle = goldGrad(gx - gr, gy, gx + gr, gy);
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    // Globe meridian (vertical ellipse)
+    ctx.save();
+    ctx.translate(gx, gy);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, gr * 0.42, gr, 0, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(201,168,76,0.7)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.restore();
+
+    // Globe equator (horizontal line)
+    ctx.beginPath();
+    ctx.moveTo(gx - gr, gy);
+    ctx.lineTo(gx + gr, gy);
+    ctx.strokeStyle = 'rgba(201,168,76,0.7)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Upper latitude line
+    const lat = gr * 0.52;
+    ctx.beginPath();
+    ctx.arc(gx, gy, Math.sqrt(gr*gr - lat*lat) * 0.98, 0, Math.PI * 2);
+    ctx.save();
+    ctx.translate(gx, gy);
+    ctx.scale(1, lat / gr);
+    ctx.beginPath();
+    ctx.arc(0, 0, gr * 0.87, 0, Math.PI * 2);
+    ctx.restore();
+
+    // Inject as apple-touch-icon
+    const dataURL = c.toDataURL('image/png');
+    let link = document.querySelector('link[rel="apple-touch-icon"]');
+    if (!link) { link = document.createElement('link'); link.rel = 'apple-touch-icon'; document.head.appendChild(link); }
+    link.href = dataURL;
+
+    // Also update favicon
+    let fav = document.querySelector('link[rel="icon"]');
+    if (!fav) { fav = document.createElement('link'); fav.rel = 'icon'; fav.type = 'image/png'; document.head.appendChild(fav); }
+    fav.href = dataURL;
+
+  } catch(e) { /* canvas not supported — SVG fallback stays */ }
+})();
+
+async function sendCmd(cmd) {
+  if (!connected || !cmdChar) { addLog(t('logNoConn'), 'err'); return; }
+  try {
+    const data = new TextEncoder().encode(cmd + '\n');
+    if (cmdChar.writeValueWithoutResponse) {
+      await cmdChar.writeValueWithoutResponse(data);
+    } else {
+      await cmdChar.writeValue(data);
+    }
+    // UI feedback
+    if (cmd === 'STOP') {
+      clearRoomStates();
+      addLog(t('logStop'), 'warn');
+    } else if (cmd === 'CAL') {
+      addLog(t('logCalib'), 'ok');
+    } else {
+      const map = {'1L':'b1l','1R':'b1r','2L':'b2l','2R':'b2r'};
+      if (map[cmd]) setRoomMoving(map[cmd]);
+      addLog(t('logCmd') + ' ' + cmd, 'ok');
+    }
+  } catch(e) {
+    addLog(t('logError') + ' ' + (e.message||''), 'err');
+  }
+}
+</script>
+</body>
+</html>
